@@ -4,6 +4,9 @@
 const Model = use('Model')
 
 class Endereco extends Model {
+    pessoa () {
+        return this.hasOne('./Pessoa')
+      }
 }
 
 module.exports = Endereco

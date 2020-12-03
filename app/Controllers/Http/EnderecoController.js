@@ -1,5 +1,6 @@
 'use strict'
-
+const Endereco = use('App/Models/Endereco')
+const Database = use('Database')
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
 /** @typedef {import('@adonisjs/framework/src/Response')} Response */
 /** @typedef {import('@adonisjs/framework/src/View')} View */
@@ -17,7 +18,7 @@ class EnderecoController {
    * @param {Response} ctx.response
    * @param {View} ctx.view
    */
-  async index ({ request, response, view }) {
+  async index({ request, response, view }) {
   }
 
   /**
@@ -29,7 +30,7 @@ class EnderecoController {
    * @param {Response} ctx.response
    * @param {View} ctx.view
    */
-  async create ({ request, response, view }) {
+  async create({ request, response, view }) {
   }
 
   /**
@@ -40,7 +41,35 @@ class EnderecoController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async store ({ request, response }) {
+  async store({ request, response }) {
+    const trx = await Database.beginTransaction()
+    try {
+      const {
+        Estado,
+        Cidade,
+        Rua,
+        Numero,
+        Bairro,
+        Complemento
+      } = request.all()
+      const endereco = await Endereco.create({
+        Estado,
+        Cidade,
+        Rua,
+        Numero,
+        Bairro,
+        Complemento
+      }, trx)
+
+      await trx.commit()
+
+      return response.status(201).send({ message: 'Endereço criado com sucesso' });
+    } catch (err) {
+        await trx.rollback()
+        return response.status(400).send({
+          error: `Erro: ${err.message}`
+        })
+    }
   }
 
   /**
@@ -52,7 +81,7 @@ class EnderecoController {
    * @param {Response} ctx.response
    * @param {View} ctx.view
    */
-  async show ({ params, request, response, view }) {
+  async show({ params, request, response, view }) {
   }
 
   /**
@@ -64,7 +93,7 @@ class EnderecoController {
    * @param {Response} ctx.response
    * @param {View} ctx.view
    */
-  async edit ({ params, request, response, view }) {
+  async edit({ params, request, response, view }) {
   }
 
   /**
@@ -75,7 +104,7 @@ class EnderecoController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async update ({ params, request, response }) {
+  async update({ params, request, response }) {
   }
 
   /**
@@ -86,7 +115,7 @@ class EnderecoController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async destroy ({ params, request, response }) {
+  async destroy({ params, request, response }) {
   }
 }
 
