@@ -5,32 +5,43 @@
 /** @typedef {import('@adonisjs/framework/src/View')} View */
 
 /**
- * Resourceful controller for interacting with pessoas
+ * Resourceful controller for interacting with Associados
  */
 const Database = use('Database')
 const Pessoa = use('App/Models/Pessoa')
 const Endereco = use('App/Models/Endereco')
 const User = use('App/Models/User')
-class PessoaController {
-
+const Associado = use('App/Models/Associado')
+import TestaCPF from('../../../Validators/ValidaCPF.js')
+const PessoaController = use('./PessoaController')
+class AssociadoController {
+  
   /**
-   * Show a list of all pessoas.
-   * GET pessoas
+   * Show a list of all Associados.
+   * GET Associados
    *
    * @param {object} ctx
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    * @param {View} ctx.view
    */
-
   async index({ request, response, view }) {
+    try {
+      const associados = await Database
+        .select('*')
+        .table('pessoas')
+        .innerJoin('associados', 'pessoas.id', 'associados.id_Pessoa')
+      response.send(associados)
+    } catch (err) {
+      return response.status(400).send({
+        error: `Erro: ${err.message}`
+      })
+    }
   }
 
-
-
   /**
-   * Render a form to be used for creating a new pessoa.
-   * GET pessoas/create
+   * Render a form to be used for creating a new Associado.
+   * GET Associados/create
    *
    * @param {object} ctx
    * @param {Request} ctx.request
@@ -41,18 +52,38 @@ class PessoaController {
   }
 
   /**
-   * Create/save a new pessoa.
-   * POST pessoas
+   * Create/save a new Associado.
+   * POST Associados
    *
    * @param {object} ctx
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
   async store({ request, response }) {
+    function TestaCPF(strCPF) {
+      var Soma;
+      var Resto;
+      Soma = 0;
+    if (strCPF == "00000000000") return false;
+  
+    for (i=1; i<=9; i++) Soma = Soma + parseInt(strCPF.substring(i-1, i)) * (11 - i);
+    Resto = (Soma * 10) % 11;
+  
+      if ((Resto == 10) || (Resto == 11))  Resto = 0;
+      if (Resto != parseInt(strCPF.substring(9, 10)) ) return false;
+  
+    Soma = 0;
+      for (i = 1; i <= 10; i++) Soma = Soma + parseInt(strCPF.substring(i-1, i)) * (12 - i);
+      Resto = (Soma * 10) % 11;
+  
+      if ((Resto == 10) || (Resto == 11))  Resto = 0;
+      if (Resto != parseInt(strCPF.substring(10, 11) ) ) return false;
+      return true;
+  }
     const trx = await Database.beginTransaction()
     try {
       const {
-        username,
+        id_instituicao,
         Nome,
         Sobrenome,
         CPF,
@@ -66,6 +97,13 @@ class PessoaController {
         Bairro,
         Complemento
       } = request.all()
+      const pess = new PessoaController()
+      if(TestaCPF(CPF))
+        return response.send({message: 'CPF válido'})
+      else if(!TestaCPF(CPF))
+      return response.send({message: 'CPF inválido'})
+      
+      
       const endereco = await Endereco.create({
         Estado,
         Cidade,
@@ -87,9 +125,14 @@ class PessoaController {
         id_user: user.id,
         id_endereco: endereco.id
       }, trx)
+      const associado = await Associado.create({
+        id_Pessoa: pessoa.id,
+        id_Instituicao: id_instituicao,
+        cadastrado: true
+      }, trx)
       await trx.commit()
 
-      return response.status(201).send({ message: 'Pessoa criada com sucesso' });
+      return response.status(201).send({ message: 'Associado criada com sucesso' });
     } catch (err) {
       await trx.rollback()
 
@@ -101,38 +144,25 @@ class PessoaController {
   }
 
   /**
-   * Display a single pessoa.
-   * GET pessoas/:id
+   * Display a single Associado.
+   * GET Associados/:id
    *
    * @param {object} ctx
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    * @param {View} ctx.view
    */
-  async chow({ params, request, response, view, auth }) {
-    try {
-      const pessoa = await Pessoa.findBy('id_user', request.params.id_user)
-      const fullPessoa = {
-        pessoa,
-        endereco: await Endereco.findBy('id', pessoa.id_endereco),
-        user: await User.findBy('id', pessoa.id_user)
-      }
-      return response.status(200).json(fullPessoa)
-    } catch (err) {
-      return response.status(400).send({
-        error: `Erro: ${err.message}`
-      })
-    }
-  }
   async show({ params, request, response, view }) {
     try {
       const pessoa = await Pessoa.findBy('id_user', request.params.id_user)
-      console.log(request.params.id_user)
-      console.log(pessoa)
-      response.send(pessoa)
-      // await pessoa.loadMany(['pessoa.endereco', 'usuario.permissao'])
-
-      // return response.status(200).json(pessoa)
+      const associado = await Associado.findBy('id_Pessoa', pessoa.id)
+      const associadoCompleto = {
+        associado: associado,
+        pessoa: pessoa,
+        endereco: await Endereco.findBy('id', pessoa.id_endereco),
+        user: await User.findBy('id', pessoa.id_user)
+      }
+      return response.status(200).json(associadoCompleto)
     } catch (err) {
       return response.status(400).send({
         error: `Erro: ${err.message}`
@@ -141,8 +171,8 @@ class PessoaController {
   }
 
   /**
-   * Render a form to update an existing pessoa.
-   * GET pessoas/:id/edit
+   * Render a form to update an existing Associado.
+   * GET Associados/:id/edit
    *
    * @param {object} ctx
    * @param {Request} ctx.request
@@ -153,31 +183,35 @@ class PessoaController {
   }
 
   /**
-   * Update pessoa details.
-   * PUT or PATCH pessoas/:id
+   * Update Associado details.
+   * PUT or PATCH Associados/:id
    *
    * @param {object} ctx
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async update({ params, request, response, auth }) {
+  async update({ params, request, response }) {
     const trx = await Database.beginTransaction()
     try {
       const pessoa = await Pessoa.findBy('id_user', request.params.id_user)
+      const associado = await Associado.findBy('id_Pessoa', pessoa.id)
       const endereco = await Endereco.findBy('id', pessoa.id_endereco)
-      const usuario = await User.find(request.params.id_user)
+      const Associado = await User.find(request.params.id_user)
 
+      const associadoReq = request.only(['cadastrado', 'liberado', 'cancelado'])
       const pessoaReq = request.only(['Nome', 'SobreNome', 'Telefone'])
       const enderecoReq = request.only(['Estado', 'Cidade', 'Bairro', 'Rua', 'Numero', 'Complemento'])
-      const usuarioReq = request.only(['email', 'password'])
+      const AssociadoReq = request.only(['email', 'password'])
 
+      associado.merge({ ...associadoReq })
       pessoa.merge({ ...pessoaReq })
       endereco.merge({ ...enderecoReq })
-      usuario.merge({ ...usuarioReq })
+      Associado.merge({ ...AssociadoReq })
 
+      await associado.save(trx)
       await pessoa.save(trx)
       await endereco.save(trx)
-      await usuario.save(trx)
+      await Associado.save(trx)
 
       await trx.commit()
 
@@ -190,51 +224,29 @@ class PessoaController {
   }
 
   /**
-   * Delete a pessoa with id.
-   * DELETE pessoas/:id
+   * Delete a Associado with id.
+   * DELETE Associados/:id
    *
    * @param {object} ctx
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async destroy({ params, request, response, auth }) {
-    const trx = await Database.beginTransaction()
+  async destroy({ params, request, response }) {
     try {
-      const pessoa = await Pessoa.findBy("id_user", request.params.id_user)
-      const endereco = await Endereco.findBy("id", pessoa.id_endereco)
       const user = await User.find(request.params.id_user)
-      await user.delete(trx)
-      await endereco.delete(trx)
-      await pessoa.delete(trx)
-      await trx.commit()
-      return response.status(201).send({ message: 'Pessoa excluída com sucesso' });
+      if (user == null)
+        return response.status(404).send({ message: 'Usuário não localizado' })
+      user.ativo = false
+      await user.save()
+
+      return response.status(204).send({ message: 'Usuário foi desativado' })
     } catch (err) {
-      await trx.rollback()
       return response.status(400).send({
         error: `Erro: ${err.message}`
       })
     }
   }
-  async TestaCPF(strCPF) {
-    console.log(strCPF)
-    var Soma;
-    var Resto;
-    Soma = 0;
-  if (strCPF == "00000000000") return false;
-
-  for (var i=1; i<=9; i++) Soma = Soma + parseInt(strCPF.substring(i-1, i)) * (11 - i);
-  Resto = (Soma * 10) % 11;
- 
-    if ((Resto == 10) || (Resto == 11))  Resto = 0;
-    if (Resto != parseInt(strCPF.substring(9, 10)) ) return false;
-
-  Soma = 0;
-    for (var i = 1; i <= 10; i++) Soma = Soma + parseInt(strCPF.substring(i-1, i)) * (12 - i);
-    Resto = (Soma * 10) % 11;
-
-    if ((Resto == 10) || (Resto == 11))  Resto = 0;
-    if (Resto != parseInt(strCPF.substring(10, 11) ) ) return false;
-    return true;
-  }
 }
-module.exports = PessoaController
+
+
+module.exports = AssociadoController

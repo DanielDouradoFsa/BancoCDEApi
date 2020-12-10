@@ -15,10 +15,10 @@ class VendaCartaoSchema extends Schema {
 
       table.bigInteger('CRM').unsigned()
       table.integer('contratoValor').unsigned()
-      table.date('ContratoInicio').notNullable();
-      table.date('ContratoFim').notNullable();
-      table.date('CataContrato').notNullable();
-      table.integer('PgtoDiasTolerancia').notNullable();
+      table.date('contratoInicio').notNullable();
+      table.date('contratoFim').notNullable();
+      table.date('cataContrato').notNullable();
+      table.integer('pgtoDiasTolerancia').notNullable();
       table.timestamps()
     })
   }

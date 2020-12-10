@@ -7,12 +7,12 @@ class EnderecoSchema extends Schema {
   up () {
     this.create('enderecos', (table) => {
       table.increments('id');
-      table.string('Estado', 20).notNullable()
-      table.string('Cidade', 30).notNullable()
-      table.string('Rua', 30).notNullable()
-      table.integer('Numero').notNullable()
-      table.string('Bairro', 80).notNullable()
-      table.string('Complemento', 40).notNullable()
+      table.string('estado', 20).notNullable()
+      table.string('cidade', 30).notNullable()
+      table.string('rua', 30).notNullable()
+      table.integer('numero').notNullable()
+      table.string('bairro', 80).notNullable()
+      table.string('complemento', 40).notNullable()
       table.timestamps()
     })
   }

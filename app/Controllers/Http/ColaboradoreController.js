@@ -1,5 +1,11 @@
 'use strict'
 
+const Database = use('Database')
+const Pessoa = use('App/Models/Pessoa')
+const Colaboradore = use('App/Models/Colaboradore')
+const Endereco = use('App/Models/Endereco')
+const User = use('App/Models/User')
+
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
 /** @typedef {import('@adonisjs/framework/src/Response')} Response */
 /** @typedef {import('@adonisjs/framework/src/View')} View */
@@ -18,6 +24,17 @@ class ColaboradoreController {
    * @param {View} ctx.view
    */
   async index ({ request, response, view }) {
+    try {
+      const colaboradores = await Database
+        .select('*')
+        .table('pessoas')
+        .innerJoin('colaboradores', 'pessoas.id', 'colaboradores.id_Pessoa')
+      response.send(colaboradores)
+    } catch (err) {
+      return response.status(400).send({
+        error: `Erro: ${err.message}`
+      })
+    }
   }
 
   /**
@@ -41,6 +58,72 @@ class ColaboradoreController {
    * @param {Response} ctx.response
    */
   async store ({ request, response }) {
+    const trx = await Database.beginTransaction()
+    try {
+      const {
+        profissao,
+        expVendas,
+        yransporteProprio,
+        MEI,
+        CNH,
+        CNHClasse,
+        CNHVencimento,
+        id_instituicao,
+        nome,
+        sobreNome,
+        CPF,
+        telefone,
+        Senha,
+        Email,
+        Estado,
+        Cidade,
+        Rua,
+        Numero,
+        Bairro,
+        Complemento
+      } = request.all()
+      const endereco = await Endereco.create({
+        Estado,
+        Cidade,
+        Rua,
+        Numero,
+        Bairro,
+        Complemento
+      }, trx)
+      const user = await User.create({
+        username: Email,
+        email: Email,
+        password: Senha,
+      }, trx)
+      const pessoa = await Pessoa.create({
+        nome,
+        sobreNome,
+        CPF,
+        telefone,
+        id_user: user.id,
+        id_endereco: endereco.id
+      }, trx)
+      const colaborador = await Colaboradore.create({
+        profissao,
+        expVendas,
+        yransporteProprio,
+        MEI,
+        CNH,
+        CNHClasse,
+        CNHVencimento,
+        id_Pessoa: pessoa.id,
+      }, trx)
+      await trx.commit()
+
+      return response.status(201).send({ message: 'Colaborador criado com sucesso' });
+    } catch (err) {
+      await trx.rollback()
+
+      return response.status(400).send({
+        error: `Erro: ${err.message}`
+      })
+
+    }
   }
 
   /**

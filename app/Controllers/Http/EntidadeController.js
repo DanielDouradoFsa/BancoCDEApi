@@ -41,6 +41,7 @@ class EntidadeController {
    * @param {Response} ctx.response
    */
   async store ({ request, response }) {
+    
   }
 
   /**

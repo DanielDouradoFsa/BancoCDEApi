@@ -12,16 +12,18 @@ class EntidadeSchema extends Schema {
         .inTable('enderecos')
         .onUpdate('CASCADE')
         .onDelete('CASCADE');
-
-      table.string('RazaoSocial', 20).notNullable()
+      table.integer('id_user').unsigned()
+        .references('id')
+        .inTable('users')
+        .onUpdate('CASCADE')
+        .onDelete('CASCADE');
+      table.string('razaoSocial', 20).notNullable()
       table.bigInteger('CNPJ').notNullable().unique()
-      table.string('NomeFantansia',20).notNullable()
-      table.string('NomeResponsavel',15).notNullable()
-      table.string('SobreNomeResp', 30).notNullable()
-      table.bigInteger('Telefone').notNullable()
-      table.bigInteger('TelefoneFixo').notNullable()
-      table.string('Email', 20).notNullable().unique()
-      table.string('senha',20).notNullable()
+      table.string('nomeFantasia',20).notNullable()
+      table.string('nomeResponsavel',15).notNullable()
+      table.string('sobreNomeResp', 30).notNullable()
+      table.bigInteger('telefone').notNullable()
+      table.bigInteger('telefoneFixo').notNullable()
       table.timestamps()
     })
   }

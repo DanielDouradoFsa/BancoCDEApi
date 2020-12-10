@@ -5,8 +5,11 @@ const Model = use('Model')
 
 class Pessoa extends Model {
     endereco () {
-        return this.belongsTo('./Endereco')
+      return this.belongsTo('./Endereco')
       }
+    user (){
+      return this.belongsTo('./User')
+    }
 }
 
 module.exports = Pessoa

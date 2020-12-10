@@ -20,15 +20,15 @@ class VendaContratoSchema extends Schema {
 
       table.bigInteger('CRM').unsigned()
       table.integer('contratoValor').unsigned()
-      table.date('ContratoInicio').notNullable();
-      table.date('ContratoFim').notNullable();
-      table.date('ContratoData').notNullable();
-      table.string('Complemento',30).notNullable()
-      table.integer('Multa').unsigned()
-      table.integer('Juros').unsigned()
-      table.date('PgtoVencimento').notNullable();
-      table.date('PgtoQuitacao ').notNullable();
-      table.integer('PgtoDiasTolerancia').notNullable();
+      table.date('contratoInicio').notNullable();
+      table.date('contratoFim').notNullable();
+      table.date('contratoData').notNullable();
+      table.string('complemento',30).notNullable()
+      table.integer('multa').unsigned()
+      table.integer('juros').unsigned()
+      table.date('pgtoVencimento').notNullable();
+      table.date('pgtoQuitacao ').notNullable();
+      table.integer('pgtoDiasTolerancia').notNullable();
       table.timestamps()
     })
   }

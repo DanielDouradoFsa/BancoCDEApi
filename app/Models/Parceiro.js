@@ -4,6 +4,9 @@
 const Model = use('Model')
 
 class Parceiro extends Model {
+    entidade(){
+        return this.belongsTo('App/Models/Entidade')
+    }
 }
 
 module.exports = Parceiro

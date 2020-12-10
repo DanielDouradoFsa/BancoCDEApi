@@ -13,8 +13,8 @@ class ParceirosSchema extends Schema {
         .onUpdate('CASCADE')
         .onDelete('CASCADE');
 
-      table.string('Categoria', 20).notNullable()
-      table.string('Segmento',20).notNullable()
+      table.string('categoria', 20).notNullable()
+      table.string('segmento',20).notNullable()
       table.timestamps()
     })
   }

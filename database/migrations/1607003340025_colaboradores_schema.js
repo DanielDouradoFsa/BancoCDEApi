@@ -13,9 +13,9 @@ class ColaboradoresSchema extends Schema {
         .onUpdate('CASCADE')
         .onDelete('CASCADE');
 
-      table.string('Profissao',20)
-      table.boolean('ExpVendas').defaultTo(false);
-      table.boolean('TransporteProprio').defaultTo(false);
+      table.string('profissao',20)
+      table.boolean('expVendas').defaultTo(false);
+      table.boolean('yransporteProprio').defaultTo(false);
       table.bigInteger('MEI').unsigned()
       table.bigInteger('CNH').unsigned()
       table.string('CNHClasse',2)

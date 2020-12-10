@@ -5,7 +5,7 @@ const Schema = use('Schema')
 
 class UsuarioSchema extends Schema {
   up() {
-    this.create('usuarios', (table) => {
+    this.create('associados', (table) => {
       table.increments('id');
       table.integer('id_Pessoa').unsigned()
         .references('id')
@@ -15,12 +15,12 @@ class UsuarioSchema extends Schema {
 
       table.integer('id_Instituicao').unsigned()
         .references('id')
-        .inTable('instituicoes')
+        .inTable('instituicaos')
         .onUpdate('CASCADE')
         .onDelete('CASCADE');
-      table.boolean('Cadastrado').defaultTo(false);
-      table.boolean('Liberado').defaultTo(false);
-      table.boolean('Cancelado').defaultTo(false);
+      table.boolean('cadastrado').defaultTo(false);
+      table.boolean('liberado').defaultTo(false);
+      table.boolean('cancelado').defaultTo(false);
       
       table.timestamps()
     })

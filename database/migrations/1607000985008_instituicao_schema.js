@@ -5,7 +5,7 @@ const Schema = use('Schema')
 
 class instituicoeschema extends Schema {
   up () {
-    this.create('instituicoes', (table) => {
+    this.create('instituicaos', (table) => {
       table.increments('id');
       table.integer('id_Entidade').unsigned()
         .references('id')
@@ -13,7 +13,7 @@ class instituicoeschema extends Schema {
         .onUpdate('CASCADE')
         .onDelete('CASCADE');
 
-      table.string('Categoria', 20).notNullable()
+      table.string('categoria', 20).notNullable()
       table.timestamps()
     })
   }
